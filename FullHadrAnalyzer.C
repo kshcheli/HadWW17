@@ -1,7 +1,7 @@
 #define FullHadrAnalyzer_cxx
 
-//#define SIG
-#define PYT
+#define SIG
+//#define PYT
 //#define DAT
 
 #include "FullHadrAnalyzer.h"
@@ -39,7 +39,7 @@
 void FullHadrAnalyzer::Loop()
 {
 
-double w; TString fi="";
+double w=1; TString fi="";
 TString fnm;fnm="out/TestOutput";
 #ifdef DAT
   cout << " ~~~~~   Running on the data ~~~~~~~~" << endl;
@@ -81,6 +81,7 @@ Long64_t jump[]={0, 156218+1, 156218+14999535+1, 156218+14999535+24828195+1, 156
    map<string,TH1D*> h1;
    map<string,TH2D*> h2;
 // TH1D
+
  h1["ptb"] = new TH1D("1", "pt_balance" , 100 , 0. , 5.);
  h1["ptb_my"] = new TH1D("2", "pt_balance my" , 100 , 0. , 5.);
  h1["ptb_bc"] = new TH1D("3", "pt_balance bc" , 100 , 0. , 5.);
@@ -114,6 +115,8 @@ Long64_t jump[]={0, 156218+1, 156218+14999535+1, 156218+14999535+24828195+1, 156
  h1["mdjNOJER"] = new TH1D("21", "mdj NO JER" , 400. , 700. , 2100.);
 
 
+ h1["pileupWeight"] = new TH1D("22", "puWeight" , 1000 , -2. , 2.);
+
 // TH2D
  h2["test2"] = new TH2D("test", "test" , 100 , 0. , 30., 100, 0, 30);
 // ______________________ LOOP START_____________________
@@ -132,7 +135,10 @@ Long64_t jump[]={0, 156218+1, 156218+14999535+1, 156218+14999535+24828195+1, 156
 //___________________  SUPPRESS (SEMI-)LEPTONIC IF SIGNAL ______________
 #ifdef SIG
 if((gen_n_e+gen_n_mu+gen_n_tau)>0)continue;
-w*=pileupWeight;
+w=pileupWeight;
+
+
+cout << "Pileup weight: "<< pileupWeight << endl;
 #endif
 
 //___________________ QCD WEIGHTING ____________________
@@ -267,7 +273,7 @@ if(NJCUT){
 dj = lj+slj;
 DIJETMCUT = (dj.M()>1126.);
 PTCUTS    = (lj.Pt()>200. && slj.Pt()>200.);
-ETACUTS   = (lj.Eta()<2.5 && slj.Eta() < 2.5);
+ETACUTS   = (fabs(lj.Eta())<2.5 && fabs(slj.Eta()) < 2.5);
 DETACUT  = ( fabs(lj.Eta()-slj.Eta()) < 1.3 );
 
 B2GCUTS=(NJCUT && PTCUTS && DIJETMCUT && ETACUTS && DETACUT);
@@ -316,7 +322,8 @@ if(B2GCUTS){
    h1["prm2"]->Fill((*jet_corrmass)[b], w);
 
 
-
+cout << "W inside loop "<< w<<endl;
+ h1["pileupWeight"]->Fill(w); 
    if(WTAGBOTH && (1 - lj.DeltaPhi(slj)/3.14159)<0.1)h1["ptb"]->Fill( (*jet_pt)[a] / (*jet_pt)[b], w);
    if(WTAGBOTHMY)h1["ptb_my"]->Fill( (*jet_pt)[a] / (*jet_pt)[b], w);
 
@@ -331,7 +338,7 @@ if(B2GCUTS){
 
 
 
-TFile* f = new TFile(fnm+fi+"fx2.root", "RECREATE");
+TFile* f = new TFile(fnm+fi+"xchecks.root", "RECREATE");
 for(map<string,TH1D*>::iterator it_histo = h1.begin(); it_histo != h1.end(); ++it_histo)
      (*it_histo).second->Write();
 for(map<string,TH2D*>::iterator it_histo = h2.begin(); it_histo != h2.end(); ++it_histo)
