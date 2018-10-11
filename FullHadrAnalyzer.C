@@ -132,6 +132,7 @@ Long64_t jump[]={0, 156218+1, 156218+14999535+1, 156218+14999535+24828195+1, 156
 //___________________  SUPPRESS NON-LEPT IF SIGNAL ______________
 #ifdef SIG
 if((gen_n_e+gen_n_mu+gen_n_tau)>0)continue;
+w*=pileupWeight;
 #endif
 
 //___________________ QCD WEIGHTING ____________________
@@ -153,6 +154,7 @@ int is=-1;
     else if (current_file_name.Contains("1000to1400") ) { fi="_5"; w = scale[5];is=5; }
     else {cout << "Weight for Pythia missing!" << endl;break;}
 
+w*=pileupWeight;
 fi="";
 
 if(jentry >= jump[is]+((int)(NSKIM[is]*0.1)) ) // use 10% of stats from each sample
@@ -198,10 +200,11 @@ int indmatched=-1;
 
 //cout << "C_JER "<< C_JER << endl;
 //cout << "before " << (*jet_pt)[ij]<< endl;
-  if(C_JER>0.){
+if(C_JER<0) C_JER=0;
+//  if(C_JER>0.){
   (*jet_pt)[ij]=(*jet_pt)[ij]*C_JER;
   (*jet_energy)[ij]=(*jet_energy)[ij]*C_JER;
- }
+ //}
 
 
      if ( (*jet_pt)[ij] > first) 
@@ -328,7 +331,7 @@ if(B2GCUTS){
 
 
 
-TFile* f = new TFile(fnm+fi+"fx.root", "RECREATE");
+TFile* f = new TFile(fnm+fi+"fx2.root", "RECREATE");
 for(map<string,TH1D*>::iterator it_histo = h1.begin(); it_histo != h1.end(); ++it_histo)
      (*it_histo).second->Write();
 for(map<string,TH2D*>::iterator it_histo = h2.begin(); it_histo != h2.end(); ++it_histo)
