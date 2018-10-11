@@ -206,7 +206,7 @@ int indmatched=-1;
 
      if ( (*jet_pt)[ij] > first) 
         { 
-            second = first; //secondi=ij;
+            second = first; secondi=firsti;
             first = (*jet_pt)[ij]; firsti=ij;
         } 
     else if ((*jet_pt)[ij] > second) 
@@ -328,7 +328,7 @@ if(B2GCUTS){
 
 
 
-TFile* f = new TFile(fnm+fi+"test.root", "RECREATE");
+TFile* f = new TFile(fnm+fi+"fx.root", "RECREATE");
 for(map<string,TH1D*>::iterator it_histo = h1.begin(); it_histo != h1.end(); ++it_histo)
      (*it_histo).second->Write();
 for(map<string,TH2D*>::iterator it_histo = h2.begin(); it_histo != h2.end(); ++it_histo)
