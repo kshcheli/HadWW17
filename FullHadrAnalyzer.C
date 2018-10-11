@@ -129,7 +129,7 @@ Long64_t jump[]={0, 156218+1, 156218+14999535+1, 156218+14999535+24828195+1, 156
 
 
  if (jentry%100000 == 0){ cout <<  jentry << " done out of "<< nentries << endl; }
-//___________________  SUPPRESS NON-LEPT IF SIGNAL ______________
+//___________________  SUPPRESS (SEMI-)LEPTONIC IF SIGNAL ______________
 #ifdef SIG
 if((gen_n_e+gen_n_mu+gen_n_tau)>0)continue;
 w*=pileupWeight;
