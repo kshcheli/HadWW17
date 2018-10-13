@@ -7,12 +7,6 @@
 #ifndef FullHadrAnalyzer_h
 #define FullHadrAnalyzer_h
 
-
-//#define SIG
-//#define PYT
-//#define DAT
-
-
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
@@ -185,6 +179,20 @@ FullHadrAnalyzer::FullHadrAnalyzer(TTree *tree) : fChain(0)
       chain->Add("/eos/cms/store/user/jjhollar/ExclWWHadronic2017Analysis/WWhadronic_QCDPt800to1000_Pythia8_merge_12Apr2018_ntuplesv2.root/demo/ntp1");
       chain->Add("/eos/cms/store/user/jjhollar/ExclWWHadronic2017Analysis/WWhadronic_QCDPt1000to1400_Pythia8_merge_12Apr2018_ntuplesv2.root/demo/ntp1");
 #endif
+
+#ifdef TTBAR
+  chain->Add("/eos/cms/store/user/jjhollar/ExclWWHadronic2017Analysis/WWhadronic_TTbarHadronic_PowhegPythia8_merge_12Apr2018_ntuplesv2.root/demo/ntp1");
+#endif
+
+#ifdef WJETS
+  chain->Add("/eos/cms/store/user/jjhollar/ExclWWHadronic2017Analysis/WWhadronic_WJetsToQQ_MadgraphPythia8_merge_ntuplesv2.root/demo/ntp1");
+#endif
+
+#ifdef ZJETS
+  chain->Add("/eos/cms/store/user/jjhollar/ExclWWHadronic2017Analysis/WWhadronic_ZJetsToQQ_MadgraphPythia8_12Apr2018_merge_ntuplesv2.root/demo/ntp1");
+#endif
+
+
       tree = chain;
 #endif // SINGLE_TREE
 

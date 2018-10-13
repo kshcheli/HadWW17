@@ -1,8 +1,15 @@
 #define FullHadrAnalyzer_cxx
 
-#define SIG
-//#define PYT
+
+
 //#define DAT
+
+//#define SIG
+//#define PYT
+//#define TTBAR
+//#define WJETS
+#define ZJETS
+
 
 #include "FullHadrAnalyzer.h"
 
@@ -46,6 +53,39 @@ TString fnm;fnm="out/TestOutput";
   fnm+="_dat";
   w=1.;
 #endif
+
+#ifdef TTBAR
+  cout << " ~~~~~   Running on the ttbar MC ~~~~~~~~" << endl;
+  fnm+="_ttbar";
+  w=1.;
+
+  double sigma[] = {377.96};
+  int    N[] = {41248864}; 
+  double scale[] = {sigma[0]/N[0]};
+#endif
+
+
+#ifdef WJETS
+  cout << " ~~~~~   Running on the W+Jets MC ~~~~~~~~" << endl;
+  fnm+="_wjets";
+  w=1.;
+
+  double sigma[] = {33.7};
+  int    N[] = {9412869}; 
+  double scale[] = {sigma[0]/N[0]};
+#endif
+
+
+#ifdef ZJETS
+  cout << " ~~~~~   Running on the Z+jets MC ~~~~~~~~" << endl;
+  fnm+="_zjets";
+  w=1.;
+
+  double sigma[] = {14.6};
+  int    N[] = {9736656}; 
+  double scale[] = {sigma[0]/N[0]};
+#endif
+
 
 #ifdef SIG
   cout << " ~~~~~   Running on the signal MC ~~~~~~~~" << endl;
@@ -117,9 +157,12 @@ Long64_t jump[]={0, 156218+1, 156218+14999535+1, 156218+14999535+24828195+1, 156
 
  h1["pileupWeight"] = new TH1D("22", "puWeight" , 1000 , -2. , 2.);
 
+ h1["tau211"] = new TH1D("23", "tau21a" , 50 , 0. , 1.);
+ h1["tau212"] = new TH1D("24", "tau21b" , 50 , 0. , 1.);
+
 // TH2D
  h2["test2"] = new TH2D("test", "test" , 100 , 0. , 30., 100, 0, 30);
-// ______________________ LOOP START_____________________
+// ___________________________________________________________________________________________________________ LOOP START_____________________
  if (fChain == 0) return;
 
    Long64_t nentries = fChain->GetEntries();
@@ -136,11 +179,15 @@ Long64_t jump[]={0, 156218+1, 156218+14999535+1, 156218+14999535+24828195+1, 156
 #ifdef SIG
 if((gen_n_e+gen_n_mu+gen_n_tau)>0)continue;
 w=pileupWeight;
-
-
-cout << "Pileup weight: "<< pileupWeight << endl;
 #endif
+//___________________   TTBAR W/Z + Jets WEIGHTING ______________________________
 
+//#ifdef TTBAR
+#if defined(TTBAR) || defined(WJETS) || defined(ZJETS)
+w=scale[0];
+w*=pileupWeight;
+//cout<<"scaled ttbar"<<endl;
+#endif
 //___________________ QCD WEIGHTING ____________________
 
 #ifdef PYT
@@ -296,6 +343,7 @@ if(B2GCUTS){
 
    h1["ptb_bc"]->Fill( (*jet_pt)[a] / (*jet_pt)[b], w);
 
+
    h1["dphi"]->Fill(1 - lj.DeltaPhi(slj)/3.14159, w);
    h1["mdj"]->Fill(dj.M(), w);
 
@@ -321,14 +369,22 @@ if(B2GCUTS){
    h1["prm1"]->Fill((*jet_corrmass)[a], w);
    h1["prm2"]->Fill((*jet_corrmass)[b], w);
 
+   
+   if(LEADPRUNEDTAG)h1["tau211"]->Fill( (*jet_tau2)[a] / (*jet_tau1)[a], w);
+   if(SLEADPRUNEDTAG)h1["tau212"]->Fill( (*jet_tau2)[b] / (*jet_tau1)[b], w);
 
-cout << "W inside loop "<< w<<endl;
+
+//cout << "W inside loop "<< w<<endl;
  h1["pileupWeight"]->Fill(w); 
    if(WTAGBOTH && (1 - lj.DeltaPhi(slj)/3.14159)<0.1)h1["ptb"]->Fill( (*jet_pt)[a] / (*jet_pt)[b], w);
    if(WTAGBOTHMY)h1["ptb_my"]->Fill( (*jet_pt)[a] / (*jet_pt)[b], w);
 
+//   if(LEADPRUNEDTAG)h1["tau21DDT1"]->Fill(tau21_DDT_a, w);
+//   if(SLEADPRUNEDTAG)h1["tau21DDT2"]->Fill(tau21_DDT_b, w);
+
    if(LEADPRUNEDTAG)h1["tau21DDT1"]->Fill(tau21_DDT_a, w);
    if(SLEADPRUNEDTAG)h1["tau21DDT2"]->Fill(tau21_DDT_b, w);
+
 
 
       }//b2gcuts
@@ -338,7 +394,7 @@ cout << "W inside loop "<< w<<endl;
 
 
 
-TFile* f = new TFile(fnm+fi+"xchecks.root", "RECREATE");
+TFile* f = new TFile(fnm+fi+"fx2.root", "RECREATE");
 for(map<string,TH1D*>::iterator it_histo = h1.begin(); it_histo != h1.end(); ++it_histo)
      (*it_histo).second->Write();
 for(map<string,TH2D*>::iterator it_histo = h2.begin(); it_histo != h2.end(); ++it_histo)
