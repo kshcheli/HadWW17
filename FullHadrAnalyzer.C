@@ -2,13 +2,14 @@
 
 
 
-//#define DAT
+#define DAT
 
 //#define SIG
+
 //#define PYT
 //#define TTBAR
 //#define WJETS
-#define ZJETS
+//#define ZJETS
 
 
 #include "FullHadrAnalyzer.h"
@@ -160,8 +161,19 @@ Long64_t jump[]={0, 156218+1, 156218+14999535+1, 156218+14999535+24828195+1, 156
  h1["tau211"] = new TH1D("23", "tau21a" , 50 , 0. , 1.);
  h1["tau212"] = new TH1D("24", "tau21b" , 50 , 0. , 1.);
 
+
+ h1["mww_fliptau"] = new TH1D("25", "mww fliptau" , 10. , 0. , 5000.);
+ h1["mww_flipaco"] = new TH1D("26", "mww flipaco" , 10. , 0. , 5000.);
+ h1["mww_flipptbal"] = new TH1D("27", "mww flip pt balance" , 10. , 0. , 5000.);
+ h1["mww_sig"] = new TH1D("28", "mww signal" , 10. , 0. , 5000.);
+
+
 // TH2D
- h2["test2"] = new TH2D("test", "test" , 100 , 0. , 30., 100, 0, 30);
+ h2["tau_vs_pruned1"] = new TH2D("tvp1", "tvp1" ,  150, 0, 300, 100 , 0. , 2.);
+ h2["tau_vs_pruned2"] = new TH2D("tvp2", "tvp2" ,  150, 0, 300, 100 , 0. , 2.);
+
+ h2["acop_vs_pt"] = new TH2D("a_vs_pt", "a_vs_pt" , 100 , 0. , 1., 80, 1, 5);
+
 // ___________________________________________________________________________________________________________ LOOP START_____________________
  if (fChain == 0) return;
 
@@ -297,7 +309,16 @@ bool B2GCUTS = false;
 
 bool WTAGBOTH = false;
 bool WTAGBOTHMY = false;
+
 bool PRUNEDTAG = false;
+bool TAUDDTTAG = false;
+
+bool ANTIPRUNEDTAG = false;
+bool ANTITAUDDTTAG = false;
+
+bool ACCOCUT = false;
+bool PTBALCUT = false;
+
 
 bool LEADPRUNEDTAG = false;
 bool SLEADPRUNEDTAG = false;
@@ -328,7 +349,16 @@ B2GCUTS=(NJCUT && PTCUTS && DIJETMCUT && ETACUTS && DETACUT);
 
 WTAGBOTH = ( (tau21_DDT_a)<0.75 && (tau21_DDT_b)<0.75 && (*jet_corrmass)[a]>65. && (*jet_corrmass)[a]<105. && (*jet_corrmass)[b]>65. && (*jet_corrmass)[b]<105. );
 WTAGBOTHMY = ( (tau21_DDT_a)<0.65 && (tau21_DDT_b)<0.65 && (*jet_corrmass)[a]>68. && (*jet_corrmass)[a]<88. && (*jet_corrmass)[b]>68. && (*jet_corrmass)[b]<88. );
+
 PRUNEDTAG = ((*jet_corrmass)[a]>65. && (*jet_corrmass)[a]<105. && (*jet_corrmass)[b]>65. && (*jet_corrmass)[b]<105.);
+TAUDDTTAG = ( (tau21_DDT_a)<0.75 && (tau21_DDT_b)<0.75 );
+
+ANTIPRUNEDTAG = ( ((*jet_corrmass)[a]<65. || (*jet_corrmass)[a]>105.) && ((*jet_corrmass)[b]<65. || (*jet_corrmass)[b]<105.));
+ANTITAUDDTTAG = ( (tau21_DDT_a)>0.75 && (tau21_DDT_b)>0.75 );
+
+
+ACCOCUT = ((1 - fabs(lj.DeltaPhi(slj))/3.14159)<0.01);
+PTBALCUT = ( ((*jet_pt)[a] / (*jet_pt)[b])<1.1);
 
 LEADPRUNEDTAG = ( (*jet_corrmass)[a]>55. && (*jet_corrmass)[a]<215. );
 SLEADPRUNEDTAG = ( (*jet_corrmass)[b]>55. && (*jet_corrmass)[b]<215. );
@@ -341,10 +371,11 @@ SLEADPRUNEDTAG = ( (*jet_corrmass)[b]>55. && (*jet_corrmass)[b]<215. );
      
 if(B2GCUTS){
 
+
    h1["ptb_bc"]->Fill( (*jet_pt)[a] / (*jet_pt)[b], w);
 
 
-   h1["dphi"]->Fill(1 - lj.DeltaPhi(slj)/3.14159, w);
+   h1["dphi"]->Fill(1 - fabs(lj.DeltaPhi(slj)/3.14159), w);
    h1["mdj"]->Fill(dj.M(), w);
 
    h1["mdjJER"]->Fill(dj.M(), w);
@@ -376,7 +407,7 @@ if(B2GCUTS){
 
 //cout << "W inside loop "<< w<<endl;
  h1["pileupWeight"]->Fill(w); 
-   if(WTAGBOTH && (1 - lj.DeltaPhi(slj)/3.14159)<0.1)h1["ptb"]->Fill( (*jet_pt)[a] / (*jet_pt)[b], w);
+   if(WTAGBOTH && ACCOCUT)h1["ptb"]->Fill( (*jet_pt)[a] / (*jet_pt)[b], w);
    if(WTAGBOTHMY)h1["ptb_my"]->Fill( (*jet_pt)[a] / (*jet_pt)[b], w);
 
 //   if(LEADPRUNEDTAG)h1["tau21DDT1"]->Fill(tau21_DDT_a, w);
@@ -386,6 +417,21 @@ if(B2GCUTS){
    if(SLEADPRUNEDTAG)h1["tau21DDT2"]->Fill(tau21_DDT_b, w);
 
 
+if(PRUNEDTAG && ANTITAUDDTTAG && ACCOCUT && PTBALCUT)h1["mww_fliptau"]->Fill(dj.M(),w);
+if(PRUNEDTAG && TAUDDTTAG && ACCOCUT && !PTBALCUT)h1["mww_flipptbal"]->Fill(dj.M(),w);
+if(PRUNEDTAG && TAUDDTTAG && !ACCOCUT && PTBALCUT)h1["mww_flipaco"]->Fill(dj.M(),w);
+if(PRUNEDTAG && TAUDDTTAG && ACCOCUT && PTBALCUT)h1["mww_sig"]->Fill(dj.M(),w);
+
+
+
+
+if(ACCOCUT && PTBALCUT){
+   h2["tau_vs_pruned1"]->Fill((*jet_corrmass)[a], tau21_DDT_a, w);
+   h2["tau_vs_pruned2"]->Fill((*jet_corrmass)[b], tau21_DDT_b, w);
+  }
+
+if(WTAGBOTH){h2["acop_vs_pt"]->Fill( (1 - fabs(lj.DeltaPhi(slj)/3.14159)) , (*jet_pt)[a] / (*jet_pt)[b] , w);}
+
 
       }//b2gcuts
  }// event loop
@@ -394,7 +440,7 @@ if(B2GCUTS){
 
 
 
-TFile* f = new TFile(fnm+fi+"fx2.root", "RECREATE");
+TFile* f = new TFile(fnm+fi+"fx3.root", "RECREATE");
 for(map<string,TH1D*>::iterator it_histo = h1.begin(); it_histo != h1.end(); ++it_histo)
      (*it_histo).second->Write();
 for(map<string,TH2D*>::iterator it_histo = h2.begin(); it_histo != h2.end(); ++it_histo)

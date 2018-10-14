@@ -164,11 +164,11 @@ FullHadrAnalyzer::FullHadrAnalyzer(TTree *tree) : fChain(0)
 #endif
       
 #ifdef DAT
-//      chain->Add("/eos/cms/store/user/kshcheli/ExclWWHadronic2017Analysis/Data17/JetHT/ExclWWjets_Run2017B-31Mar2018-v1_all.root/demo/ntp1");
-      chain->Add("/eos/cms/store/user/kshcheli/ExclWWHadronic2017Analysis/Data17/JetHT/ExclWWjets_Run2017C-31Mar2018-v1_all.root/demo/ntp1");
-//      chain->Add("/eos/cms/store/user/kshcheli/ExclWWHadronic2017Analysis/Data17/JetHT/ExclWWjets_Run2017D-31Mar2018-v1_all.root/demo/ntp1");
-//      chain->Add("/eos/cms/store/user/kshcheli/ExclWWHadronic2017Analysis/Data17/JetHT/ExclWWjets_Run2017E-31Mar2018-v1_all.root/demo/ntp1");
-//      chain->Add("/eos/cms/store/user/kshcheli/ExclWWHadronic2017Analysis/Data17/JetHT/ExclWWjets_Run2017F-31Mar2018-v1_all.root/demo/ntp1");
+      chain->Add("/eos/cms/store/user/kshcheli/ExclWWHadronic2017Analysis/Data17/JetHT/ExclWWjets_Run2017B-31Mar2018-v1_all.root/demo/ntp1");
+//      chain->Add("/eos/cms/store/user/kshcheli/ExclWWHadronic2017Analysis/Data17/JetHT/ExclWWjets_Run2017C-31Mar2018-v1_all.root/demo/ntp1");
+      chain->Add("/eos/cms/store/user/kshcheli/ExclWWHadronic2017Analysis/Data17/JetHT/ExclWWjets_Run2017D-31Mar2018-v1_all.root/demo/ntp1");
+      chain->Add("/eos/cms/store/user/kshcheli/ExclWWHadronic2017Analysis/Data17/JetHT/ExclWWjets_Run2017E-31Mar2018-v1_all.root/demo/ntp1");
+      chain->Add("/eos/cms/store/user/kshcheli/ExclWWHadronic2017Analysis/Data17/JetHT/ExclWWjets_Run2017F-31Mar2018-v1_all.root/demo/ntp1");
 #endif
 
 #ifdef PYT
